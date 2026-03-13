@@ -1,0 +1,50 @@
+
+
+libmodbus:
+
+    Option (1): Downlaod 'libmodbus-master.zip' as zip file from
+                https://github.com/stephane/libmodbus and copy it
+                to target (e.g. using WinSCP)
+
+                Unzip libmodbus-master.zip from the archive on the target, so
+                that all file permissions and attributes are retained:
+
+                unzip ./libmodbus-master.zip
+                mv libmodbus-master libmodbus
+
+
+    Option (2): Downlaod 'libmodbus' using 'wget' from
+                https://github.com/stephane/libmodbus
+
+                wget https://github.com/stephane/libmodbus/archive/refs/heads/master.zip
+
+                unzip master.zip
+                mv libmodbus-master libmodbus
+
+
+
+    Build 'libmodbus':
+
+                cd libmodbus
+                ./autogen.sh
+                ./configure --prefix=/home/smm/bin
+
+                make
+                make install
+
+
+
+    libmodbus output directory:
+
+                /home/smm/bin/include/modbus                -> modbus.h
+                /home/smm/bin/lib                           -> libmodbus.so
+
+
+
+    Inform the system of the path to the ‘libmodbus.so’ library:
+
+                export LD_LIBRARY_PATH=/home/smm/bin/lib
+                ./SmartMeterMonitor/SmartMeterMonitor -c=config.ini
+
+
+

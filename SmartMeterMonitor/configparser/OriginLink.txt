@@ -1,0 +1,6 @@
+
+
+Simple, lightweight C++ configuration/ini file parser for Linux
+
+    https://github.com/dzilles/configparser
+
