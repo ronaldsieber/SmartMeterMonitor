@@ -1,3 +1,4 @@
+﻿
 # SmartMeterMonitor
 
 This project implements an application for reading electricity meters (SmartMeter) via the Modbus/RTU interface. Additionally, an optional gas meter sensor can be integrated via the S0 interface (GPIO). The captured measurement values are published as JSON records via MQTT to a broker and can thus be used in smart home systems or for databases (e.g., InfluxDB).
@@ -22,8 +23,9 @@ The application is primarily designed for use on a ***sysWORXX Pi-AM62x with Sma
 |--------|-------------|
 | Eastron SDM230 | Single-phase electricity meter |
 | Eastron SDM630 | Three-phase electricity meter |
+| Janitza UMG96RM | Three-phase electricity meter |
 
-The SmartMeters are connected to the controller board (*sysWORXX Pi-AM62x* or *Raspberry Pi*) via an RS485 adapter (Modbus/RTU). The adapter uses a serial interface (e.g., `/dev/ttyS3`, `/dev/ttyUSB0`).
+The SmartMeters are connected to the controller board (*sysWORXX Pi-AM62x* or *Raspberry Pi*) via an RS485 adapter (Modbus/RTU). The adapter uses a serial interface (e.g., `/dev/ttyS4`, `/dev/ttyUSB0`).
 
 ![\[SmartMeter - SDM230\]](Documentation/SDM230.png)
 
@@ -60,6 +62,18 @@ The S0 pulse output of the gas meter sensor is connected to a GPIO pin of the co
 | Energy | kWh | `"Energy":` |
 
 ### SDM630 (Three-phase)
+
+| Measurement | Unit | JSON Key |
+|-------------|------|----------|
+| Voltage L1, L2, L3 | V | `"Voltage_L1":`, `"Voltage_L2":`, `"Voltage_L3":` |
+| Current L1, L2, L3 | A | `"Current_L1":`, `"Current_L2":`, `"Current_L3":` |
+| Power L1, L2, L3 | W | `"Power_L1":`, `"Power_L2":`, `"Power_L3":` |
+| Total Current | A | `"Current_Sum":` |
+| Total Power | W | `"Power_Sum":` |
+| Frequency | Hz | `"Frequency":` |
+| Energy | kWh | `"Energy":` |
+
+### UMG96RM (Three-phase)
 
 | Measurement | Unit | JSON Key |
 |-------------|------|----------|
@@ -118,7 +132,7 @@ This section contains global settings that apply to the entire application.
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| MbInterface | Yes | Modbus interface (e.g., `/dev/ttyS0`, `/dev/ttyUSB0`)<br>(sysWORXX Pi-AM62x with Smart Metering HAT: `/dev/ttyS3`) |
+| MbInterface | Yes | Modbus interface (e.g., `/dev/ttyS0`, `/dev/ttyUSB0`)<br>(sysWORXX Pi-AM62x with Smart Metering HAT: `/dev/ttyS4`) |
 | Baudrate | Yes | Baud rate of the serial interface (e.g., `9600`) |
 | QueryInterval | Yes | Query interval in seconds (e.g., `60`) |
 | InterDevPause | No | Pause between device queries in seconds (e.g., `0.25`) |
@@ -146,7 +160,7 @@ A separate section is created for each SmartMeter. The sections must be numbered
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| Type | Yes | Device type (`SDM230` or `SDM630`) |
+| Type | Yes | Device type (`SDM230`, `SDM630` or `UMG96RM`) |
 | ModbusID | Yes | Modbus Slave ID (1-247) |
 | Label | No | Description of the measuring point (for topic and JSON) |
 
@@ -172,6 +186,8 @@ The retain file has the following format:
 ```
 MeterValue = 1234.56
 ```
+
+At runtime, the current counter value is written back to the retain file as soon as its value has increased by at least the amount defined as `SAVE_DELTA_VALUE`.
 
 #### EnergyFactor
 
@@ -266,7 +282,7 @@ A typical gas heating system in a two-family house generates about 0.03 m³/min 
 
 ```ini
 [Settings]
-MbInterface = /dev/ttyS3            ; RS485 Modbus/RTU for SmartMeter
+MbInterface = /dev/ttyS4            ; RS485 Modbus/RTU for SmartMeter
 Baudrate = 9600
 QueryInterval = 60                  ; [sec]
 InterDevPause = 0.25                ; [sec]
@@ -326,13 +342,13 @@ OPTION:
 ## Startup Script
 
 The example script `run_SmartMeterMonitor.sh` performs the following tasks:
-- Setting RS485 mode for the serial interface `/dev/ttyS3` (only necessary for *sysWORXX Pi-AM62x* with *Smart Metering HAT*)
+- Setting RS485 mode for the serial interface `/dev/ttyS4` (only necessary for *sysWORXX Pi-AM62x* with *Smart Metering HAT*)
 - Setting the library path variable `LD_LIBRARY_PATH` for `libmodbus.so` (see section "Building the Application" below)
 - Starting the application
 
 ```bash
 #!/bin/bash
-rs485-setup /dev/ttyS3
+rs485-setup /dev/ttyS4
 export LD_LIBRARY_PATH=/home/smm/bin/lib
 ./SmartMeterMonitor/SmartMeterMonitor -c=config.ini
 ```
@@ -351,7 +367,7 @@ With active *Smart Metering HAT* overlay, the following settings apply for the c
 
 ```ini
 [Settings]
-MbInterface = /dev/ttyS3            ; RS485 Modbus/RTU Interface for SmartMeter
+MbInterface = /dev/ttyS4            ; RS485 Modbus/RTU Interface for SmartMeter
 
 [GasMeter]
 SensorGpio = 0                      ; GPIO Pin for GasMeter/S0-Sensor
@@ -510,14 +526,24 @@ cd /home/smm/SmartMeterMonitor/SmartMeterMonitor
 make
 ```
 
-If the installation path for the `libmodbus` library differs, the line
+If the installation path for the `libmodbus` library differs, the following line in the script `run_SmartMeterMonitor.sh` may need to be adjusted:
 
 ```bash
 export LD_LIBRARY_PATH=/home/smm/bin/lib
 ```
 
-in the script `run_SmartMeterMonitor.sh` may need to be adjusted. The application can then be started with the script.
+To read data from SmartMeters via Modbus, the application requires access to the serial interface. To do this, the user `smm` must be added to the `dialout` group:
 
+```bash
+sudo usermod -a -G dialout smm
+```
+
+The application can then be started using the script `run_SmartMeterMonitor.sh`. If a GasMeter is being used, the application requires the `sysworxx_io` I/O driver and must therefore be run with `sudo`. If only SmartMeters are to be queried, `sudo` is not required.
+
+```bash
+cd /home/smm/SmartMeterMonitor
+sudo ./run_SmartMeterMonitor.sh
+```
 
 ## Adding Additional SmartMeter Types
 
