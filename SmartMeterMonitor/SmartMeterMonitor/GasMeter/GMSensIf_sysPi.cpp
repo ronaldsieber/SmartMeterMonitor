@@ -365,9 +365,9 @@ uint64_t  u64TimeStamp;
         uiMeasurementTableIdx_l++;
     }
     pthread_mutex_unlock(&mutTableMutex_l);
-    
+
     return;
-    
+
 }
 
 #endif

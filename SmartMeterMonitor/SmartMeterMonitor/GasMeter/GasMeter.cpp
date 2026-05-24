@@ -204,8 +204,8 @@ int  iRes;
     return (tError::kSuccess);
 
 }
-    
-    
+
+
 
 //---------------------------------------------------------------------------
 //  ReadCounter
@@ -626,7 +626,7 @@ tError          ErrCode;
     }
 
     // open RetainFile for writing, trunc (clear full contents) if exists
-    pRetainFile = new std::ofstream(pszRetainFile_p, std::ios::trunc);          
+    pRetainFile = new std::ofstream(pszRetainFile_p, std::ios::trunc);
     if (pRetainFile == NULL)
     {
         fprintf(stderr, "ERROR: Can't open File '%s'\n", pszRetainFile_p);
