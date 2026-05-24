@@ -82,7 +82,7 @@ class SDM230 : public SmartMeter
 
         int                 GetModbusSlaveID (void);
         const char*         GetDevTypeName (void);
-        const char*         GetErrorText (SmartMeter::tError Sdm230Err_p);
+        const char*         GetErrorText (SmartMeter::tError SmError_p);
 
 
     //-----------------------------------------------------------------------

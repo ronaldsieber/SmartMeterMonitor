@@ -193,7 +193,7 @@ int  iIdx;
 
     for (iIdx=0; iIdx<MODBUS_REG_COUNT; iIdx++)
     {
-        LibSys::JoinStr(m_szModbusRegDump, sizeof(m_szModbusRegDump), "Reg[%03d]: %5d  (%4XH)\n", iIdx, (int)m_aui16ModbusRegBuff[iIdx], (int)m_aui16ModbusRegBuff[iIdx]);
+        LibSys::JoinStr(m_szModbusRegDump, sizeof(m_szModbusRegDump), "Reg[%03d]: %5d  (%4XH)\n", (MODBUS_REG_START + iIdx), (int)m_aui16ModbusRegBuff[iIdx], (int)m_aui16ModbusRegBuff[iIdx]);
     }
 
     TRACE2("SDM230: DumpModbusRegs -> %d of %d byte buffer was used\n", strlen(m_szModbusRegDump), sizeof(m_szModbusRegDump));
