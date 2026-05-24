@@ -15,6 +15,7 @@
   Revision History:
 
   2026/01/17 -rs:   V1.00 Initial version
+  2026/04/24 -rs:   V1.02 Add support for Janitza UMG96RM
 
 ****************************************************************************/
 
@@ -34,6 +35,7 @@
 #include "SmartMeter.h"
 #include "SDM230.h"
 #include "SDM630.h"
+#include "UMG96RM.h"
 #include "Trace.h"
 
 #ifdef _GASMETER_
@@ -880,6 +882,11 @@ int        iNumOfDevices;
             // setup a SDM630
             SmDev.m_pSmartMeter = new SDM630();
         }
+        else if (strcasecmp(CfgDev.m_strType.c_str(), "UMG96RM") == 0)
+        {
+            // setup a UMG96RM
+            SmDev.m_pSmartMeter = new UMG96RM();
+        }
         else
         {
             TRACE1("\nERROR: Unknown Device Type ('%s')!\n", CfgDev.m_strType.c_str());
@@ -927,7 +934,7 @@ SmDevice  SmDev;
         SmDev = *lstSmDevIterator;
         delete SmDev.m_pSmartMeter;
     }
- 
+
     return;
 
 }
@@ -991,7 +998,7 @@ static  void  ReleaseGmDevice (GmDevice* pGmDev_p)
     }
 
     delete pGmDev_p->m_pGasMeter;
- 
+
     return;
 
 }
@@ -1256,7 +1263,7 @@ size_t       nStartPos;
     {
         MqttLoginData.m_strPassword = pszDefPassword_p;
     }
-        
+
 
     return (MqttLoginData);
 

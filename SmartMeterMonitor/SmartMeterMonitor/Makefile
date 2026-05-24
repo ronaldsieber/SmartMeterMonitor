@@ -11,6 +11,7 @@
 #  Revision History:                                                        #
 #                                                                           #
 #  2026/01/17 -rs:   V1.00 Initial version                                  #
+#  2026/04/24 -rs:   V1.02 Add support for Janitza UMG96RM                  #
 #                                                                           #
 #****************************************************************************
 
@@ -58,6 +59,7 @@ OBJS				= Main.o \
 					  LibMqtt.o \
 					  SDM230.o \
 					  SDM630.o \
+					  UMG96RM.o \
 					  GasMeter.o \
 					  GMSensIf_sysPi.o \
 					  configparser.o \
@@ -122,6 +124,10 @@ SDM230.o:			Makefile $(SRC_SMARTMETER)/SDM230.cpp
 					@$(CC) $(CFLAGS) -c $(SRC_SMARTMETER)/$(notdir $*.cpp) $(INCLUDE) -o $*.o
 
 SDM630.o:			Makefile $(SRC_SMARTMETER)/SDM630.cpp
+					@echo "Compiling '$(notdir $*.cpp)'..."
+					@$(CC) $(CFLAGS) -c $(SRC_SMARTMETER)/$(notdir $*.cpp) $(INCLUDE) -o $*.o
+
+UMG96RM.o:			Makefile $(SRC_SMARTMETER)/UMG96RM.cpp
 					@echo "Compiling '$(notdir $*.cpp)'..."
 					@$(CC) $(CFLAGS) -c $(SRC_SMARTMETER)/$(notdir $*.cpp) $(INCLUDE) -o $*.o
 
