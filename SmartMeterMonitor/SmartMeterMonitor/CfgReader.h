@@ -105,7 +105,7 @@ class CfgGasMeter
         int             m_iSensorGpio;
         int             m_iElasticity;
         int             m_iCounterDelta;
-        float           m_flVolumeFactor; 
+        float           m_flVolumeFactor;
         float           m_flEnergyFactor;
         std::string     m_strRetainFile;
         std::string     m_strLabel;
