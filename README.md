@@ -108,15 +108,15 @@ The S0 pulse output of the gas meter sensor is connected to a GPIO pin of the co
           |
 +--------------------+     +--------------------+     +------------+
 |                    |     |                    |     |  SDM230    |
-|                    |     |     sysWORXX       |     |  SDM630    |
-|    sysWORXX        |-----|  Smart Metering    |-----|            |
-|    Pi-AM62x        |     |       HAT          |     +------------+
-|                    |     |                    |       Modbus/RTU
-|                    |     |                    |         RS485
-+--------------------+     |                    |
-                           |                    |     +------------+
-                           |                    |-----|  ES-GAS-2  |
-                           +--------------------+     +------------+
+|                    |     |                    |-----|  SDM630    |
+|                    |     |                    |     |  UMG96RM   |
+|     sysWORXX       |     |      sysWORXX      |     +------------+
+|     Pi-AM62x       |-----|   Smart Metering   |       Modbus/RTU
+|                    |     |        HAT         |         RS485
+|                    |     |                    |
+|                    |     |                    |     +------------+
+|                    |     |                    |-----|  ES-GAS-2  |
++--------------------+     +--------------------+     +------------+
                                                         DI/Pulse
                                                            S0
 ```
@@ -133,7 +133,7 @@ This section contains global settings that apply to the entire application.
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | MbInterface | Yes | Modbus interface (e.g., `/dev/ttyS0`, `/dev/ttyUSB0`)<br>(sysWORXX Pi-AM62x with Smart Metering HAT: `/dev/ttyS4`) |
-| Baudrate | Yes | Baud rate of the serial interface (e.g., `9600`) |
+| Baudrate | Yes | Baud rate of the serial interface (e.g., `9600`)<br>8N1 is fix (8 Data Bits, No parity, 1 Stop Bit) |
 | QueryInterval | Yes | Query interval in seconds (e.g., `60`) |
 | InterDevPause | No | Pause between device queries in seconds (e.g., `0.25`) |
 | MqttBroker | Yes | IP address and port of the MQTT broker (e.g., `192.168.3.200:1883`) |
@@ -305,6 +305,11 @@ Label = Flat_2
 Type = SDM230
 ModbusID = 21
 Label = HeatPump
+
+[Device004]
+Type = UMG96RM
+ModbusID = 3
+Label = Main_Terminal
 
 [GasMeter]
 SensorGpio = 0                      ; GPIO Pin for GasMeter/S0-Sensor
